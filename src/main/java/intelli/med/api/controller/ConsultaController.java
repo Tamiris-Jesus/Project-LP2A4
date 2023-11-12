@@ -1,6 +1,7 @@
 package intelli.med.api.controller;
 
 import intelli.med.api.domain.consulta.*;
+import intelli.med.api.domain.paciente.DadosDetalhamentoPaciente;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class ConsultaController {
 
     @GetMapping
     public ResponseEntity<List<DadosListagemConsulta>> listar() {
-        var page = repository.findAll().stream().map(DadosListagemConsulta::new).toList();
+        var page = repository.findAllByMotivoCancelamentoIsNull().stream().map(DadosListagemConsulta::new).toList();
         return ResponseEntity.ok(page);
     }
 
@@ -40,6 +41,14 @@ public class ConsultaController {
     public ResponseEntity cancelar(@RequestBody @Valid DadosCancelamentoConsulta dados) {
         agenda.cancelar(dados);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity detalhar(@PathVariable Long id) {
+
+        var consulta = repository.getReferenceById(id);
+
+        return ResponseEntity.ok(new DadosDetalhamentoConsulta(consulta));
     }
 
 }
