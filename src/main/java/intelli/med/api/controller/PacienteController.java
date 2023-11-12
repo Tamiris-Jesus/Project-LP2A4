@@ -72,11 +72,11 @@ public class PacienteController {
     @GetMapping("/{id}")
     public ResponseEntity detalhar(@PathVariable Long id) {
 
-        List<Endereco> enderecos = enderecoRepository.findAllByPessoaId(id);
+        //List<Endereco> enderecos = enderecoRepository.findAllByPessoaId(id);
 
         var paciente = repository.getReferenceById(id);
 
-        return ResponseEntity.ok(new DetalhamentoPacienteEndereco(paciente, enderecos));
+        return ResponseEntity.ok(new DadosDetalhamentoPaciente (paciente));
     }
 
 }
