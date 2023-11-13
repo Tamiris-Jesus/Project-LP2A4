@@ -1,5 +1,6 @@
 package intelli.med.api.controller;
 
+import intelli.med.api.domain.endereco.DadosListagemEndereco;
 import intelli.med.api.domain.paciente.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -69,14 +70,20 @@ public class PacienteController {
         return ResponseEntity.noContent().build();
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity detalhar(@PathVariable Long id) {
-
-        //List<Endereco> enderecos = enderecoRepository.findAllByPessoaId(id);
-
+        List<DadosListagemEndereco> enderecosDTO = enderecoRepository.findAllByPessoaId(id).stream().map(DadosListagemEndereco::new).toList();
         var paciente = repository.getReferenceById(id);
-
-        return ResponseEntity.ok(new DadosDetalhamentoPaciente (paciente));
+        return ResponseEntity.ok(new DetalhamentoPacienteEndereco(paciente, enderecosDTO));
     }
+
+    //    @GetMapping("/{id}")
+//    public ResponseEntity detalhar(@PathVariable Long id) {
+//
+//        //List<Endereco> enderecos = enderecoRepository.findAllByPessoaId(id);
+//        var paciente = repository.getReferenceById(id);
+//        return ResponseEntity.ok(new DadosDetalhamentoPaciente (paciente));
+//    }
 
 }
