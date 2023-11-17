@@ -1,5 +1,6 @@
 package intelli.med.api.controller;
 
+import intelli.med.api.domain.endereco.DadosListagemEndereco;
 import intelli.med.api.domain.medico.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -67,8 +68,9 @@ public class MedicoController {
 
     @GetMapping("/{id}")
     public ResponseEntity detalhar(@PathVariable Long id) {
+        List<DadosListagemEndereco> enderecosDTO = enderecoRepository.findAllByPessoaId(id).stream().map(DadosListagemEndereco::new).toList();
         var medico = repository.getReferenceById(id);
-        return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
+        return ResponseEntity.ok(new DetalhamentoMedicoEndereco(medico, enderecosDTO));
     }
 
 

@@ -1,6 +1,8 @@
 package intelli.med.api.controller;
 
 import intelli.med.api.domain.administrador.*;
+import intelli.med.api.domain.endereco.DadosListagemEndereco;
+import intelli.med.api.domain.paciente.DetalhamentoPacienteEndereco;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import intelli.med.api.domain.endereco.DadosEndereco;
@@ -55,6 +57,13 @@ public class AdministradorController {
         administrador.excluir();
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity detalhar(@PathVariable Long id) {
+        List<DadosListagemEndereco> enderecosDTO = enderecoRepository.findAllByPessoaId(id).stream().map(DadosListagemEndereco::new).toList();
+        var administrador = repository.getReferenceById(id);
+        return ResponseEntity.ok(new DetalhamentoAdministradorEndereco(administrador, enderecosDTO));
     }
 
 }
