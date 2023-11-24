@@ -39,6 +39,7 @@ public class Endereco {
     }
 
 
+
     public void setPessoa(Pessoa pessoa) {
         this.pessoa = pessoa;
     }
@@ -65,7 +66,7 @@ public class Endereco {
 //        this.complemento = endereco.getComplemento();
 //    }
 
-    public void atualizarInformacoes(DadosEndereco dados) {
+    public void atualizarInformacoes(DadosAtualizacaoEndereco dados) {
         if (dados.logradouro() != null) {
             this.logradouro = dados.logradouro();
         }

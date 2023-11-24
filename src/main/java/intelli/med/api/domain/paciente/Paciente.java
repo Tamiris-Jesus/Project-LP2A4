@@ -35,9 +35,9 @@ public class Paciente extends Pessoa {
         if (dados.telefone() != null) {
             this.setTelefone(dados.telefone());
         }
-        if (dados.endereco() != null) {
-//            this.getEnderecos().forEach(endereco -> endereco.atualizarInformacoes(dados.endereco()));
-        }
+//        if (dados.endereco() != null) {
+////            this.getEnderecos().forEach(endereco -> endereco.atualizarInformacoes(dados.endereco()));
+//        }
 
     }
 
