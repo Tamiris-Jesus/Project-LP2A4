@@ -2,16 +2,9 @@ package intelli.med.api.controller;
 
 import intelli.med.api.domain.administrador.*;
 import intelli.med.api.domain.endereco.*;
-import intelli.med.api.domain.paciente.DadosAtualizacaoPaciente;
-import intelli.med.api.domain.paciente.DadosDetalhamentoPaciente;
-import intelli.med.api.domain.paciente.DetalhamentoPacienteEndereco;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -72,18 +65,18 @@ public class AdministradorController {
         var adm = repository.getReferenceById(dados.id());
         adm.atualizarInformacoes(dados);
 
-        List<Long> enderecoIds = dados.enderecos().stream().map(DadosAtualizacaoEndereco::id).collect(Collectors.toList());
-        List<Endereco> enderecos = enderecoRepository.findAllByPessoaIdAndIdIn(dados.id(), enderecoIds);
-
-        for (Endereco endereco : enderecos) {
-            for (DadosAtualizacaoEndereco dadosEndereco : dados.enderecos()) {
-                if (endereco.getId().equals(dadosEndereco.id())) {
-                    endereco.atualizarInformacoes(dadosEndereco);
-                    break;
-                }
+        for (DadosAtualizacaoEndereco dadosEndereco : dados.enderecos()) {
+            // Se o ID do endereço não estiver presente, é um novo endereço adicional
+            if (dadosEndereco.id() == null || dadosEndereco.id().toString().isEmpty()) {
+                Endereco novoEndereco = new Endereco(adm, dadosEndereco);
+                enderecoRepository.save(novoEndereco);
+            } else {
+                // Se o ID do endereço estiver presente, é uma atualização do endereço existente
+                Endereco enderecoExistente = enderecoRepository.findById(dadosEndereco.id()).get();
+                enderecoExistente.atualizarInformacoes(dadosEndereco);
             }
         }
+
         return ResponseEntity.ok(new DadosDetalhamentoAdministrador(adm));
     }
-
 }

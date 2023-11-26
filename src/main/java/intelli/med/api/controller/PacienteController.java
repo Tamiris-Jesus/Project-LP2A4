@@ -13,7 +13,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -56,17 +55,18 @@ public class PacienteController {
         var paciente = repository.getReferenceById(dados.id());
         paciente.atualizarInformacoes(dados);
 
-        List<Long> enderecoIds = dados.enderecos().stream().map(DadosAtualizacaoEndereco::id).collect(Collectors.toList());
-        List<Endereco> enderecos = enderecoRepository.findAllByPessoaIdAndIdIn(dados.id(), enderecoIds);
-
-        for (Endereco endereco : enderecos) {
-            for (DadosAtualizacaoEndereco dadosEndereco : dados.enderecos()) {
-                if (endereco.getId().equals(dadosEndereco.id())) {
-                    endereco.atualizarInformacoes(dadosEndereco);
-                    break;
-                }
+        for (DadosAtualizacaoEndereco dadosEndereco : dados.enderecos()) {
+            // Se o ID do endereço não estiver presente, é um novo endereço adicional
+            if (dadosEndereco.id() == null || dadosEndereco.id().toString().isEmpty()) {
+                Endereco novoEndereco = new Endereco(paciente, dadosEndereco);
+                enderecoRepository.save(novoEndereco);
+            } else {
+                // Se o ID do endereço estiver presente, é uma atualização do endereço existente
+                Endereco enderecoExistente = enderecoRepository.findById(dadosEndereco.id()).get();
+                enderecoExistente.atualizarInformacoes(dadosEndereco);
             }
         }
+
         return ResponseEntity.ok(new DadosDetalhamentoPaciente(paciente));
     }
 
@@ -80,20 +80,10 @@ public class PacienteController {
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity detalhar(@PathVariable Long id) {
         List<DadosListagemEndereco> enderecosDTO = enderecoRepository.findAllByPessoaId(id).stream().map(DadosListagemEndereco::new).toList();
         var paciente = repository.getReferenceById(id);
         return ResponseEntity.ok(new DetalhamentoPacienteEndereco(paciente, enderecosDTO));
     }
-
-    //    @GetMapping("/{id}")
-//    public ResponseEntity detalhar(@PathVariable Long id) {
-//
-//        //List<Endereco> enderecos = enderecoRepository.findAllByPessoaId(id);
-//        var paciente = repository.getReferenceById(id);
-//        return ResponseEntity.ok(new DadosDetalhamentoPaciente (paciente));
-//    }
-
 }

@@ -1,7 +1,6 @@
 package intelli.med.api.controller;
 
 import intelli.med.api.domain.consulta.*;
-import intelli.med.api.domain.paciente.DadosDetalhamentoPaciente;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +49,4 @@ public class ConsultaController {
 
         return ResponseEntity.ok(new DadosDetalhamentoConsulta(consulta));
     }
-
 }

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record DadosAtualizacaoEndereco(
-        @NotNull
+
         Long id,
         String logradouro,
         String bairro,

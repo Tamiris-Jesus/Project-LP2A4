@@ -38,6 +38,16 @@ public class Endereco {
         this.complemento = dados.complemento();
     }
 
+    public Endereco(Pessoa pessoa, DadosAtualizacaoEndereco dados) {
+        this.pessoa = pessoa;
+        this.logradouro = dados.logradouro();
+        this.bairro = dados.bairro();
+        this.cep = dados.cep();
+        this.uf = dados.uf();
+        this.cidade = dados.cidade();
+        this.numero = dados.numero();
+        this.complemento = dados.complemento();
+    }
 
 
     public void setPessoa(Pessoa pessoa) {
@@ -54,17 +64,6 @@ public class Endereco {
         this.numero = dados.numero();
         this.complemento = dados.complemento();
     }
-
-//    public Endereco(Pessoa pessoa, Endereco endereco) {
-//        this.pessoa = pessoa;
-//        this.logradouro = endereco.getLogradouro();
-//        this.bairro = endereco.getBairro();
-//        this.cep = endereco.getCep();
-//        this.uf = endereco.getUf();
-//        this.cidade = endereco.getCidade();
-//        this.numero = endereco.getNumero();
-//        this.complemento = endereco.getComplemento();
-//    }
 
     public void atualizarInformacoes(DadosAtualizacaoEndereco dados) {
         if (dados.logradouro() != null) {
