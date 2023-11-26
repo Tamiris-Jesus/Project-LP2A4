@@ -1,13 +1,12 @@
 package intelli.med.api.controller;
 
 import intelli.med.api.domain.administrador.*;
-import intelli.med.api.domain.endereco.DadosListagemEndereco;
+import intelli.med.api.domain.endereco.*;
+import intelli.med.api.domain.paciente.DadosAtualizacaoPaciente;
+import intelli.med.api.domain.paciente.DadosDetalhamentoPaciente;
 import intelli.med.api.domain.paciente.DetalhamentoPacienteEndereco;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import intelli.med.api.domain.endereco.DadosEndereco;
-import intelli.med.api.domain.endereco.Endereco;
-import intelli.med.api.domain.endereco.EnderecoRepository;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("administradores")
@@ -64,6 +64,26 @@ public class AdministradorController {
         List<DadosListagemEndereco> enderecosDTO = enderecoRepository.findAllByPessoaId(id).stream().map(DadosListagemEndereco::new).toList();
         var administrador = repository.getReferenceById(id);
         return ResponseEntity.ok(new DetalhamentoAdministradorEndereco(administrador, enderecosDTO));
+    }
+
+    @PostMapping("/atualizar")
+    @Transactional
+    public ResponseEntity<DadosDetalhamentoAdministrador> atualizar(@RequestBody @Valid DadosAtualizacaoAdministrador dados) {
+        var adm = repository.getReferenceById(dados.id());
+        adm.atualizarInformacoes(dados);
+
+        List<Long> enderecoIds = dados.enderecos().stream().map(DadosAtualizacaoEndereco::id).collect(Collectors.toList());
+        List<Endereco> enderecos = enderecoRepository.findAllByPessoaIdAndIdIn(dados.id(), enderecoIds);
+
+        for (Endereco endereco : enderecos) {
+            for (DadosAtualizacaoEndereco dadosEndereco : dados.enderecos()) {
+                if (endereco.getId().equals(dadosEndereco.id())) {
+                    endereco.atualizarInformacoes(dadosEndereco);
+                    break;
+                }
+            }
+        }
+        return ResponseEntity.ok(new DadosDetalhamentoAdministrador(adm));
     }
 
 }

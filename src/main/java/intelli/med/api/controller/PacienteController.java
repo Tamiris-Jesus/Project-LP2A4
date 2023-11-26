@@ -50,7 +50,7 @@ public class PacienteController {
         return ResponseEntity.ok(page);
     }
 
-    @PutMapping
+    @PostMapping("/atualizar")
     @Transactional
     public ResponseEntity<DadosDetalhamentoPaciente> atualizar(@RequestBody @Valid DadosAtualizacaoPaciente dados) {
         var paciente = repository.getReferenceById(dados.id());

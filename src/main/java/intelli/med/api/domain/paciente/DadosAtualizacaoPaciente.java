@@ -11,6 +11,8 @@ public record DadosAtualizacaoPaciente(
         @NotNull
         Long id,
         String nome,
+        String email,
+        String cpf,
         String telefone,
         @Valid List<DadosAtualizacaoEndereco> enderecos) {
 }

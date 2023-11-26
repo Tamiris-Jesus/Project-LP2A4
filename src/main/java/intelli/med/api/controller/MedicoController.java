@@ -1,12 +1,11 @@
 package intelli.med.api.controller;
 
-import intelli.med.api.domain.endereco.DadosListagemEndereco;
+import intelli.med.api.domain.administrador.DadosAtualizacaoAdministrador;
+import intelli.med.api.domain.administrador.DadosDetalhamentoAdministrador;
+import intelli.med.api.domain.endereco.*;
 import intelli.med.api.domain.medico.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import intelli.med.api.domain.endereco.DadosEndereco;
-import intelli.med.api.domain.endereco.Endereco;
-import intelli.med.api.domain.endereco.EnderecoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("medicos")
@@ -48,12 +48,32 @@ public class MedicoController {
         return ResponseEntity.ok(page);
     }
 
-    @PutMapping
+//    @PutMapping
+//    @Transactional
+//    public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados) {
+//        var medico = repository.getReferenceById(dados.id());
+//        medico.atualizarInformacoes(dados);
+//
+//        return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
+//    }
+
+    @PostMapping("/atualizar")
     @Transactional
-    public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados) {
+    public ResponseEntity<DadosDetalhamentoMedico> atualizar(@RequestBody @Valid DadosAtualizacaoMedico dados) {
         var medico = repository.getReferenceById(dados.id());
         medico.atualizarInformacoes(dados);
 
+        List<Long> enderecoIds = dados.enderecos().stream().map(DadosAtualizacaoEndereco::id).collect(Collectors.toList());
+        List<Endereco> enderecos = enderecoRepository.findAllByPessoaIdAndIdIn(dados.id(), enderecoIds);
+
+        for (Endereco endereco : enderecos) {
+            for (DadosAtualizacaoEndereco dadosEndereco : dados.enderecos()) {
+                if (endereco.getId().equals(dadosEndereco.id())) {
+                    endereco.atualizarInformacoes(dadosEndereco);
+                    break;
+                }
+            }
+        }
         return ResponseEntity.ok(new DadosDetalhamentoMedico(medico));
     }
 
